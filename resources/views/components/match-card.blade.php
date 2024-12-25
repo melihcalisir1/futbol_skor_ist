@@ -2,7 +2,7 @@
 
 <div class="bg-gray-800 rounded-lg p-4 mb-4 hover:bg-gray-700 transition-colors">
     <div class="flex items-center justify-between mb-2">
-        <!-- Lig Bilgisi -->
+        <!-- Lig Bilgisi -->.
         <div class="flex items-center space-x-2">
             <img src="{{ $match['league']['flag'] }}" alt="{{ $match['league']['country'] }}" class="w-6 h-4">
             <span class="text-sm text-gray-400">{{ $match['league']['name'] }}</span>
@@ -10,7 +10,7 @@
                 <i class="far fa-star"></i>
             </button>
         </div>
-        
+
         <!-- Maç Durumu -->
         <div class="flex items-center space-x-2">
             @if($match['status'] === 'LIVE')
@@ -60,7 +60,7 @@
                     <span>{{ $match['details']['shots']['home'] }} - {{ $match['details']['shots']['away'] }}</span>
                 </div>
             </div>
-            
+
             <!-- Olaylar -->
             <div class="col-span-2">
                 @foreach($match['details']['events'] as $event)
