@@ -1,54 +1,53 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <h1 class="text-center mb-4">Canlı Maçlar</h1>
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold">Canlı Maçlar</h1>
+        </div>
 
-        @if(count($matches) > 0)
-            @php
-                // Liglere göre gruplandırma
-                $groupedMatches = collect($matches)->groupBy(function ($match) {
-                    return $match['league']['name'] ?? 'Diğer Ligler';
-                });
-            @endphp
-
-            @foreach($groupedMatches as $league => $leagueMatches)
-                <div class="card mb-4">
-                    <div class="card-header bg-danger text-white">
-                        <strong>{{ $league }}</strong>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @forelse($matches as $match)
+                <div class="bg-white shadow-md rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <!-- Ev Sahibi Takım -->
+                        <div class="flex items-center">
+                            <img src="{{ $match['home_team']['logo'] }}"
+                                 alt="{{ $match['home_team']['name'] }}"
+                                 class="w-12 h-12 mr-2">
+                            <span class="font-semibold text-gray-700">{{ $match['home_team']['name'] }}</span>
+                        </div>
+                        <!-- Skor -->
+                        <span class="text-xl font-bold text-blue-600">
+                        {{ $match['score']['home'] ?? '-' }} - {{ $match['score']['away'] ?? '-' }}
+                    </span>
+                        <!-- Deplasman Takım -->
+                        <div class="flex items-center">
+                            <span class="font-semibold text-gray-700">{{ $match['away_team']['name'] }}</span>
+                            <img src="{{ $match['away_team']['logo'] }}"
+                                 alt="{{ $match['away_team']['name'] }}"
+                                 class="w-12 h-12 ml-2">
+                        </div>
                     </div>
-                    <div class="card-body p-0">
-                        <table class="table table-hover mb-0">
-                            <thead class="thead-dark">
-                            <tr>
-                                <th>Saat</th>
-                                <th>Ev Sahibi</th>
-                                <th>Deplasman</th>
-                                <th>Skor</th>
-                                <th>Durum</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($leagueMatches as $match)
-                                <tr>
-                                    <td>{{ \Carbon\Carbon::parse($match['fixture']['date'])->format('H:i') }}</td>
-                                    <td>{{ $match['teams']['home']['name'] }}</td>
-                                    <td>{{ $match['teams']['away']['name'] }}</td>
-                                    <td>
-                                        {{ $match['goals']['home'] ?? 0 }} - {{ $match['goals']['away'] ?? 0 }}
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-success">{{ $match['fixture']['status']['elapsed'] ?? 0 }}'</span>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
+                    <!-- Lig ve Dakika -->
+                    <div class="text-center">
+                    <span class="text-sm text-gray-600">
+                        {{ $match['league']['name'] }} - {{ $match['minute'] ?? '---' }}.'
+                    </span>
+                    </div>
+                    <!-- Maç Detayları -->
+                    <div class="mt-4 text-center">
+                        <a href="{{ route('matches.show', $match['id']) }}"
+                           class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+                            Maç Detayları
+                        </a>
                     </div>
                 </div>
-            @endforeach
-        @else
-            <p class="text-center">Şu anda canlı maç bulunmuyor.</p>
-        @endif
+            @empty
+                <div class="col-span-full text-center text-gray-600">
+                    Şu anda canlı maç bulunmuyor.
+                </div>
+            @endforelse
+        </div>
     </div>
 @endsection

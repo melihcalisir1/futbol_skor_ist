@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Http;
 class MatchController extends Controller
 {
     protected $footballApiService;
+    protected $matchService;
 
     public function __construct(ApiFootballService $footballApiService)
     {
@@ -60,26 +61,27 @@ class MatchController extends Controller
         ]);
     }
 
-    public function live()
+    public function live(Request $request)
     {
-        // API'den canlı maçları çek
-        $response = Http::withHeaders([
-            'x-rapidapi-key' => env('FOOTBALL_API_KEY'),
-            'x-rapidapi-host' => 'v3.football.api-sports.io',
-        ])->get('https://v3.football.api-sports.io/fixtures', [
-            'live' => 'all', // Canlı maçlar için doğru parametre
-        ]);
+        // Tarih bilgisi (seçilen tarih yoksa bugünün tarihi alınır)
+        $selectedDate = $request->input('date', now()->toDateString());
 
-        // Yanıtı kontrol et
-        if ($response->successful()) {
-            $matches = $response->json()['response']; // Canlı maçlar
-        } else {
-            $matches = []; // Hata durumunda boş liste
-        }
+        // Canlı maçları al
+        $liveMatches = $this->footballApiService->getLiveMatches();
+
+        // Tarihe göre filtreleme (eğer tarih seçilirse)
+        $filteredMatches = collect($liveMatches)->filter(function ($match) use ($selectedDate) {
+            return $match['date'] === $selectedDate;
+        });
 
         // Verileri view'e gönder
-        return view('matches.live', compact('matches'));
+        return view('matches.live', [
+            'matches' => $filteredMatches,
+            'selectedDate' => $selectedDate,
+        ]);
     }
+
+
 
 
     public function finished()
