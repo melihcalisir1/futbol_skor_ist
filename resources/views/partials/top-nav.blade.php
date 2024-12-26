@@ -61,6 +61,7 @@
         <a href="{{ route('matches.index') }}" class="{{ request()->routeIs('matches.index') ? 'active' : '' }}">TÜMÜ</a>
         <a href="{{ route('matches.live') }}" class="{{ request()->routeIs('matches.live') ? 'active' : '' }}">CANLI</a>
         <a href="{{ route('matches.finished') }}" class="{{ request()->routeIs('matches.finished') ? 'active' : '' }}">BİTMİŞ</a>
+        <a href="{{ route('matches.odds') }}" class="{{ request()->routeIs('matches.odds') ? 'active' : '' }}">ORANLAR</a>
         <a href="{{ route('matches.scheduled') }}" class="{{ request()->routeIs('matches.scheduled') ? 'active' : '' }}">PROGRAMLAR</a>
     </div>
     <div>

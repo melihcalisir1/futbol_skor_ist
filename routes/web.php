@@ -9,6 +9,7 @@ Route::get('/finished', [MatchController::class, 'finished'])->name('matches.fin
 Route::get('/scheduled', [MatchController::class, 'scheduled'])->name('matches.scheduled');
 Route::get('/league/{league}', [MatchController::class, 'league'])->name('league.matches');
 Route::get('/matches/{id}', [MatchController::class, 'show'])->name('matches.show');
+Route::get('/odds', [MatchController::class, 'odds'])->name('matches.odds');
 
 
 // AJAX endpoints
