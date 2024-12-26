@@ -15,31 +15,43 @@ class MatchController extends Controller
         $this->footballApiService = $footballApiService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        // Bugünün tarihini al
-        $today = now()->toDateString();
+        // Tarih bilgisi (seçilen tarih yoksa bugünün tarihi alınır)
+        $selectedDate = $request->input('date', now()->toDateString());
 
-        // API çağrısı
-        $response = Http::withHeaders([
-            'x-rapidapi-key' => env('FOOTBALL_API_KEY'), // FOOTBALL_API_KEY çağırıldı
+        // Canlı maçları çek
+        $liveResponse = Http::withHeaders([
+            'x-rapidapi-key' => env('FOOTBALL_API_KEY'),
             'x-rapidapi-host' => 'v3.football.api-sports.io',
         ])->get('https://v3.football.api-sports.io/fixtures', [
-            'date' => $today,
+            'live' => 'all', // Canlı maçlar için parametre
         ]);
 
-        // Yanıtı kontrol et
-        if ($response->successful()) {
-            $matches = $response->json()['response']; // Maçları al
-        } else {
-            $matches = []; // Hata durumunda boş liste
-        }
+        $liveMatches = $liveResponse->successful() ? collect($liveResponse->json()['response']) : collect();
+
+        // Seçilen tarihteki maçları çek
+        $dateResponse = Http::withHeaders([
+            'x-rapidapi-key' => env('FOOTBALL_API_KEY'),
+            'x-rapidapi-host' => 'v3.football.api-sports.io',
+        ])->get('https://v3.football.api-sports.io/fixtures', [
+            'date' => $selectedDate, // Tarihe göre maçlar
+        ]);
+
+        $dateMatches = $dateResponse->successful() ? collect($dateResponse->json()['response']) : collect();
 
         // Verileri view'e gönder
-        return view('matches.index', compact('matches'));
+        return view('matches.index', [
+            'liveMatches' => $liveMatches,
+            'dateMatches' => $dateMatches,
+            'selectedDate' => $selectedDate,
+        ]);
     }
 
-public function show($matchId)
+
+
+
+    public function show($matchId)
     {
         $matchDetails = $this->footballApiService->getMatchDetails($matchId);
 

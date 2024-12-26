@@ -1,59 +1,107 @@
 @extends('layouts.app')
 
 @section('content')
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .card {
+            background-color: #ffffff; /* Kartın arka planı beyaz */
+            color: #333333; /* Yazı renklerini koyu gri yapıyoruz */
+            width: 100%;
+            box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
 
-    <div class="container">
-        <h1 class="text-center mb-4">Bugün Oynanacak Maçlar</h1>
+        .match_info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 10px;
+            border-bottom: 1px solid #ddd;
+        }
 
-        @if(count($matches) > 0)
-            @php
-                // Liglere göre gruplandırma
-                $groupedMatches = collect($matches)->groupBy(function ($match) {
-                    return $match['league']['name'] ?? 'Diğer Ligler';
-                });
-            @endphp
+        .team1, .team2 {
+            display: flex;
+            align-items: center;
+            color: #333333; /* Takım isimleri için koyu gri */
+        }
 
-            @foreach($groupedMatches as $league => $leagueMatches)
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <strong>{{ $league }}</strong>
-                    </div>
-                    <div class="card-body p-0">
-                        <table class="table table-hover mb-0">
-                            <thead class="thead-dark">
-                            <tr>
-                                <th>Saat</th>
-                                <th>Ev Sahibi</th>
-                                <th>Deplasman</th>
-                                <th>Durum</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($leagueMatches as $match)
-                                <tr>
-                                    <td>{{ \Carbon\Carbon::parse($match['fixture']['date'])->format('H:i') }}</td>
-                                    <td>{{ $match['teams']['home']['name'] }}</td>
-                                    <td>{{ $match['teams']['away']['name'] }}</td>
-                                    <td>{{ $match['fixture']['status']['short'] }}</td>
-                                    <td>
-                                        @if($match['fixture']['status']['short'] == 'LIVE')
-                                            <button class="btn btn-success btn-sm">Canlı İzle</button>
-                                        @else
-                                            <button class="btn btn-secondary btn-sm" disabled>Başlamadı</button>
+        .team1 img, .team2 img {
+            height: 50px;
+            width: 50px;
+            margin-right: 10px;
+        }
+
+        .vs {
+            background-color: #e0e0e0; /* VS arka planı açık gri */
+            color: #333333; /* VS yazısı koyu gri */
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .seeDetails a {
+            text-decoration: none;
+            color: #007bff; /* LIVE butonu mavi renkte */
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .seeDetails a:hover {
+            color: #0056b3; /* LIVE butonu hover efekti */
+        }
+
+    </style>
+
+        <div class="container">
+            <!-- Tarihe Göre Maçlar -->
+            @if($dateMatches->isNotEmpty())
+                @foreach($dateMatches->groupBy('league.name') as $league => $leagueMatches)
+                    <div class="card">
+                        <h3 class="card_title">{{ $league }}</h3>
+                        @foreach($leagueMatches as $match)
+                            <div class="match_info">
+                                <!-- Ev Sahibi -->
+                                <div class="team1">
+                                    <img src="{{ $match['teams']['home']['logo'] ?? '' }}" alt="Home Logo">
+                                    <span>
+                                {{ $match['teams']['home']['name'] }}
+                                        @if($match['goals']['home'] !== null)
+                                            <strong>({{ $match['goals']['home'] }})</strong>
                                         @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
+                            </span>
+                                </div>
+                                <!-- VS -->
+                                <div class="vs">
+                                    <p>VS</p>
+                                </div>
+                                <!-- Deplasman -->
+                                <div class="team2">
+                            <span>
+                                {{ $match['teams']['away']['name'] }}
+                                @if($match['goals']['away'] !== null)
+                                    <strong>({{ $match['goals']['away'] }})</strong>
+                                @endif
+                            </span>
+                                    <img src="{{ $match['teams']['away']['logo'] ?? '' }}" alt="Away Logo">
+                                </div>
+                                <!-- Detaylar -->
+                                <div class="seeDetails">
+                                    @if($match['fixture']['status']['short'] === 'FT')
+                                        <a href="#" style="color: green; font-weight: bold;">BİTTİ</a>
+                                    @else
+                                        <a href="#">LIVE</a>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
-                </div>
-            @endforeach
-        @else
-            <p class="text-center">Bugün için herhangi bir maç bulunamadı.</p>
-        @endif
-    </div>
+                @endforeach
+            @else
+                <p class="text-center text-muted">Seçilen tarihte herhangi bir maç bulunamadı.</p>
+            @endif
+        </div>
 @endsection
