@@ -34,7 +34,7 @@ class ApiFootballService implements FootballApiInterface
     public function getMatches(string $date): array
     {
         $cacheKey = "matches_{$date}";
-        
+
         return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($date) {
             $response = Http::withHeaders([
                 'X-RapidAPI-Key' => $this->apiKey,
@@ -55,10 +55,10 @@ class ApiFootballService implements FootballApiInterface
     public function getLeagueMatches(string $league, string $date): array
     {
         $cacheKey = "league_{$league}_matches_{$date}";
-        
+
         return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($league, $date) {
             $leagueId = $this->getLeagueId($league);
-            
+
             $response = Http::withHeaders([
                 'X-RapidAPI-Key' => $this->apiKey,
                 'X-RapidAPI-Host' => 'api-football-v1.p.rapidapi.com'
@@ -91,7 +91,7 @@ class ApiFootballService implements FootballApiInterface
 
         $data = $response->json();
         $matches = isset($data['response']) ? $this->formatMatches($data['response']) : [];
-        
+
         // Observer'ları bilgilendir
         foreach ($this->observers as $observer) {
             $observer->notify($matches);
@@ -103,7 +103,7 @@ class ApiFootballService implements FootballApiInterface
     public function getFinishedMatches(string $date): array
     {
         $cacheKey = "finished_matches_{$date}";
-        
+
         return Cache::remember($cacheKey, now()->addHours(1), function () use ($date) {
             $response = Http::withHeaders([
                 'X-RapidAPI-Key' => $this->apiKey,
@@ -125,7 +125,7 @@ class ApiFootballService implements FootballApiInterface
     public function getScheduledMatches(): array
     {
         $cacheKey = 'scheduled_matches';
-        
+
         return Cache::remember($cacheKey, now()->addHours(1), function () {
             $response = Http::withHeaders([
                 'X-RapidAPI-Key' => $this->apiKey,
@@ -146,7 +146,7 @@ class ApiFootballService implements FootballApiInterface
     public function getMatchDetails(int $matchId): array
     {
         $cacheKey = "match_details_{$matchId}";
-        
+
         return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($matchId) {
             $response = Http::withHeaders([
                 'X-RapidAPI-Key' => $this->apiKey,
@@ -167,7 +167,7 @@ class ApiFootballService implements FootballApiInterface
     public function getLeagueInfo(string $league): array
     {
         $cacheKey = "league_info_{$league}";
-        
+
         return Cache::remember($cacheKey, now()->addDays(1), function () use ($league) {
             $response = Http::withHeaders([
                 'X-RapidAPI-Key' => $this->apiKey,
@@ -188,7 +188,7 @@ class ApiFootballService implements FootballApiInterface
     public function getTeamInfo(int $teamId): array
     {
         $cacheKey = "team_info_{$teamId}";
-        
+
         return Cache::remember($cacheKey, now()->addDays(1), function () use ($teamId) {
             $response = Http::withHeaders([
                 'X-RapidAPI-Key' => $this->apiKey,
@@ -313,7 +313,7 @@ class ApiFootballService implements FootballApiInterface
     public function getMatchOdds(int $matchId): array
     {
         $cacheKey = "match_odds_{$matchId}";
-        
+
         return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($matchId) {
             $response = Http::withHeaders([
                 'X-RapidAPI-Key' => $this->apiKey,
@@ -344,7 +344,7 @@ class ApiFootballService implements FootballApiInterface
                     'draw' => null,
                     'away' => null
                 ];
-                
+
                 foreach ($bet['values'] as $value) {
                     switch ($value['value']) {
                         case 'Home':
@@ -361,11 +361,11 @@ class ApiFootballService implements FootballApiInterface
                             break;
                     }
                 }
-                
+
                 return [$odds];
             }
         }
-        
+
         return [];
     }
 

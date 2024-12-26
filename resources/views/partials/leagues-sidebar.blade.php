@@ -1,3 +1,8 @@
+<style>/* Ligler Sidebar'daki altı çizili kelimeleri kaldır */
+    .leagues-sidebar a {
+        text-decoration: none !important; /* Alt çizgiyi kaldırır */
+</style>
+
 <div class="space-y-4">
     <!-- Takımlarım -->
     <div>
@@ -88,13 +93,13 @@
     function toggleFavorite(leagueId) {
         const favorites = JSON.parse(localStorage.getItem('favoriteLeagues') || '[]');
         const index = favorites.indexOf(leagueId);
-        
+
         if (index === -1) {
             favorites.push(leagueId);
         } else {
             favorites.splice(index, 1);
         }
-        
+
         localStorage.setItem('favoriteLeagues', JSON.stringify(favorites));
         updateFavoriteIcons();
     }
