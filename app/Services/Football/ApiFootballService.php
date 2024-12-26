@@ -102,25 +102,27 @@ class ApiFootballService implements FootballApiInterface
 
     public function getFinishedMatches(string $date): array
     {
-        $cacheKey = "finished_matches_{$date}";
+        $response = Http::withHeaders([
+            'X-RapidAPI-Key' => $this->apiKey,
+            'X-RapidAPI-Host' => 'v3.football.api-sports.io',
+        ])->get("https://v3.football.api-sports.io/fixtures", [
+            'date' => $date, // Seçilen tarih
+            'status' => 'FT', // Maç bitmiş durumu
+        ]);
 
-        return Cache::remember($cacheKey, now()->addHours(1), function () use ($date) {
-            $response = Http::withHeaders([
-                'X-RapidAPI-Key' => $this->apiKey,
-                'X-RapidAPI-Host' => 'api-football-v1.p.rapidapi.com'
-            ])->get("{$this->baseUrl}/fixtures", [
-                'date' => $date,
-                'status' => 'FT'
-            ]);
+        // Eğer yanıt başarısızsa boş bir dizi döndür
+        if (!$response->successful()) {
+            return [];
+        }
 
-            if (!$response->successful()) {
-                return [];
-            }
+        $data = $response->json();
 
-            $data = $response->json();
-            return isset($data['response']) ? $this->formatMatches($data['response']) : [];
-        });
+        // Yanıtı formatla ve döndür
+        return isset($data['response']) ? $this->formatMatches($data['response']) : [];
     }
+
+
+
 
     public function getScheduledMatches(): array
     {

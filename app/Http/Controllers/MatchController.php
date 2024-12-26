@@ -11,6 +11,8 @@ class MatchController extends Controller
     protected $footballApiService;
     protected $matchService;
 
+
+
     public function __construct(ApiFootballService $footballApiService)
     {
         $this->footballApiService = $footballApiService;
@@ -84,16 +86,27 @@ class MatchController extends Controller
 
 
 
-    public function finished()
+    public function finished(Request $request)
     {
-        $finishedMatches = $this->footballApiService->getFinishedMatches(date('Y-m-d'));
+        // Tarih bilgisi (seçilen tarih yoksa bugünün tarihi alınır)
+        $selectedDate = $request->input('date', now()->toDateString());
 
+        // Servis üzerinden tamamlanan maçları çek
+        $finishedMatches = $this->footballApiService->getFinishedMatches($selectedDate);
+
+        // Verileri view'e gönder
         return view('matches.finished', [
-            'matches' => $finishedMatches
+            'matches' => $finishedMatches, // Servisten dönen maç verileri
+            'selectedDate' => $selectedDate, // Seçilen tarih
         ]);
     }
 
-public function scheduled()
+
+
+
+
+
+    public function scheduled()
     {
         $scheduledMatches = $this->footballApiService->getScheduledMatches();
 
